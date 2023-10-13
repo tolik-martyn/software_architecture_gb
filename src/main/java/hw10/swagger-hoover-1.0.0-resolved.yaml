@@ -1,0 +1,429 @@
+openapi: 3.0.0
+info:
+  title: API Робот-пылесос
+  version: 1.0.0
+
+servers:
+  # Added by API Auto Mocking Plugin
+  - description: SwaggerHub API Auto Mocking
+    url: https://virtserver.swaggerhub.com/MAFIKTOLIK/swagger-hoover/1.0.0
+  - url: http://localhost:8080/api/hw9
+
+paths:
+  /robot/{hoover_id}:
+    get:
+      summary: Получить информацию о роботе-пылесосе по ID
+      description: Получение информации о роботе-пылесосе по его идентификатору.
+      operationId: getRobotInfoById
+      parameters:
+        - name: hoover_id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: Успешный запрос
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  hoover_name:
+                    type: string
+                  model:
+                    type: string
+                    enum: [Roborock, Dreame, Legee]
+                  serial_number:
+                    type: integer
+                  description:
+                    type: string
+                  status:
+                    type: string
+                    enum: [Зарядка, Уборка, Пауза, Завершена]
+                  condition:
+                    type: string
+                    enum: [Нормальное, Разряжено, Заполнено, Сломано]
+                  charge_level:
+                    type: integer
+                  container_level:
+                    type: integer
+        400:
+          description: Некорректный запрос
+        default:
+          description: Ошибка сервера
+      tags:
+        - Робот-пылесос
+    delete:
+      summary: Удалить робота-пылесоса
+      description: Удаление робота-пылесоса из системы по его идентификатору.
+      operationId: deleteRobot
+      parameters:
+        - name: hoover_id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: Робот-пылесос успешно удален
+        400:
+          description: Некорректный запрос
+        default:
+          description: Ошибка сервера
+      tags:
+        - Робот-пылесос
+
+  /robot/version:
+    get:
+      summary: Проверить версию ПО робота-пылесоса
+      description: Получение текущей версии программного обеспечения робота-пылесоса.
+      operationId: checkSoftwareVersion
+      responses:
+        200:
+          description: Успешный запрос
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  software_version:
+                    type: integer
+        400:
+          description: Некорректный запрос
+        default:
+          description: Ошибка сервера
+      tags:
+        - Робот-пылесос
+
+  /robot/schedule:
+    get:
+      summary: Получить список доступных программ уборки
+      description: Получение списка доступных программ уборки в зависимости от настроек робота-пылесоса.
+      operationId: getCleaningPrograms
+      responses:
+        200:
+          description: Успешный запрос
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  dry_cleaning:
+                    type: boolean
+                  wet_cleaning:
+                    type: boolean
+        400:
+          description: Некорректный запрос
+        default:
+          description: Ошибка сервера
+      tags:
+        - Робот-пылесос
+
+  /user:
+    post:
+      summary: Добавить нового пользователя
+      description: Добавление нового пользователя в систему.
+      operationId: addUser
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+      responses:
+        200:
+          description: Пользователь успешно добавлен
+        400:
+          description: Некорректный запрос
+        default:
+          description: Ошибка сервера
+      tags:
+        - Пользователь
+        
+  /user/{user_id}:
+    delete:
+      summary: Удалить пользователя
+      description: Удаление пользователя из системы по его идентификатору.
+      operationId: deleteUser
+      parameters:
+        - name: user_id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: Пользователь успешно удален
+        400:
+          description: Некорректный запрос
+        default:
+          description: Ошибка сервера
+      tags:
+        - Пользователь
+
+  /robot:
+    post:
+      summary: Добавить нового робота-пылесоса
+      description: Добавление нового робота-пылесоса в систему.
+      operationId: addRobot
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Hoover'
+      responses:
+        200:
+          description: Робот-пылесос успешно добавлен
+        400:
+          description: Некорректный запрос
+        default:
+          description: Ошибка сервера
+      tags:
+        - Робот-пылесос
+
+  /robot/start-cleaning/{hoover_id}:
+      post:
+        summary: Включить уборку
+        description: Включение уборки на роботе-пылесосе.
+        operationId: startCleaning
+        parameters:
+          - name: hoover_id
+            in: path
+            required: true
+            schema:
+              type: integer
+        responses:
+          200:
+            description: Уборка успешно включена
+          400:
+            description: Некорректный запрос
+          default:
+            description: Ошибка сервера
+        tags:
+          - Робот-пылесос
+          
+  /robot/stop-cleaning/{hoover_id}:
+    post:
+      summary: Отключить уборку
+      description: Отключение текущей уборки на роботе-пылесосе.
+      operationId: stopCleaning
+      parameters:
+        - name: hoover_id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: Уборка успешно остановлена
+        400:
+          description: Некорректный запрос
+        default:
+          description: Ошибка сервера
+      tags:
+        - Робот-пылесос
+
+  /robot/update-software:
+    post:
+      summary: Обновить версию ПО
+      description: Обновление версии программного обеспечения для робота-пылесоса.
+      operationId: updateSoftware
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                hoover_id:
+                  type: integer
+                software_version:
+                  type: integer
+      responses:
+        200:
+          description: Версия ПО успешно обновлена
+        400:
+          description: Некорректный запрос
+        default:
+          description: Ошибка сервера
+      tags:
+        - Робот-пылесос
+
+  /robot/change-name:
+    put:
+      summary: Изменить имя пылесоса
+      description: Изменение имени робота-пылесоса.
+      operationId: changeRobotName
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                hoover_id:
+                  type: integer
+                hoover_name:
+                  type: string
+      responses:
+        200:
+          description: Имя пылесоса успешно изменено
+        400:
+          description: Некорректный запрос
+        default:
+          description: Ошибка сервера
+      tags:
+        - Робот-пылесос
+
+  /robot/change-schedule:
+    put:
+      summary: Поменять расписание
+      description: Изменение времени начала и времени работы робота-пылесоса для определенного дня недели.
+      operationId: changeSchedule
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                hoover_id:
+                  type: integer
+                weekday:
+                  type: string
+                  enum: [пн, вт, ср, чт, пт, сб, вс]
+                start_time:
+                  type: string
+                  format: time
+                work_time:
+                  type: integer
+      responses:
+        200:
+          description: Расписание успешно изменено
+        400:
+          description: Некорректный запрос
+        default:
+          description: Ошибка сервера
+      tags:
+        - Робот-пылесос
+
+  /robot/change-working-regime:
+    put:
+      summary: Поменять режима работы
+      description: Изменение режима работы робота-пылесоса.
+      operationId: changeWorkingRegime
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                schedule_id:
+                  type: integer
+                working_regime:
+                  type: string
+                  enum: [сухая уборка, влажная уборка, комбинированная уборка, экстренная уборка]
+      responses:
+        200:
+          description: Режим работы успешно изменен
+        400:
+          description: Некорректный запрос
+        default:
+          description: Ошибка сервера
+      tags:
+        - Робот-пылесос
+
+components:
+  schemas:
+    User:
+      type: object
+      properties:
+        user_id:
+          type: integer
+        user_name:
+          type: string
+        email:
+          type: string
+        hash_log_pass:
+          type: integer
+        codeword:
+          type: string
+
+    Hoover:
+      type: object
+      properties:
+        hoover_id:
+          type: integer
+        hoover_name:
+          type: string
+        model:
+          type: string
+          enum: [Roborock, Dreame, Legee]
+        serial_number:
+          type: integer
+        photo_id:
+          type: integer
+        description:
+          type: string
+        software_version:
+          type: integer
+        status:
+          type: string
+          enum: [Зарядка, Уборка, Пауза, Завершена]
+        condition:
+          type: string
+          enum: [Нормальное, Разряжено, Заполнено, Сломано]
+        charge_level:
+          type: integer
+        container_level:
+          type: integer
+        dry_cleaning:
+          type: boolean
+        wet_cleaning:
+          type: boolean
+
+    Schedule:
+      type: object
+      properties:
+        schedule_id:
+          type: integer
+        weekday:
+          type: string
+          enum: [пн, вт, ср, чт, пт, сб, вс]
+        start_time:
+          type: string
+          format: time
+        work_time:
+          type: integer
+        working_regime:
+          type: string
+          enum: [сухая уборка, влажная уборка, комбинированная уборка, экстренная уборка]
+        user_group_id:
+          type: integer
+        hoover_id:
+          type: integer
+
+    UserGroup:
+      type: object
+      properties:
+        user_group_id:
+          type: integer
+        user_id:
+          type: integer
+
+    Photo:
+      type: object
+      properties:
+        photo_id:
+          type: integer
+        photo_link:
+          type: string
+
+tags:
+  - name: Робот-пылесос
+    description: Запросы и сущности, связанные с роботами-пылесосами
+  - name: Пользователь
+    description: Запросы и сущности, связанные с пользователями

@@ -1,0 +1,213 @@
+uml
+@startuml
+package client {
+    class Authentication {
+        - userProvider : UserProvider
+        + authenticate(String, int) : boolean
+    }
+    class EnterData {
+        - static scanner : Scanner
+        + static enterInt(String) : int
+        + static enterString(String) : String
+        + static enterDate(String) : String
+        + static enterAmount(String) : int
+    }
+    class Start {
+        - userProvider : UserProvider
+        - ticketProvider : TicketProvider
+        - cashProvider : CashProvider
+        + startApp() : void
+        - loginUser() : void
+        - registerUser() : void
+        - searchTickets() : void
+    }
+}
+package core {
+    class CashProvider {
+        - cashRepository : CashRepository
+        + makeTransaction(int, long, long) : boolean
+        + getClients() : BankAccount[0.*]
+        + findAccountByAccountNumber(long) : BankAccount
+        + isClientAuthorized(BankAccount) : boolean
+    }
+    class Customer {
+        - selectedTickets : Ticket[0.*]
+        - user : User
+        - cashProvider : CashProvider
+        - ticketProvider : TicketProvider
+        + selectTickets(Ticket[0.*]) : void
+        + buySelectedTickets() : Ticket[0.*]
+        + buyTicket(Ticket) : boolean
+        + searchTickets(int) : Ticket[0.*]
+    }
+    class TicketProvider {
+        - ticketRepository : ITicketRepo
+        + getTicketsByRoute(int) : Ticket[0.*]
+        + updateTicket(Ticket) : void
+        + createTicket(int, String, Date, int) : Ticket
+    }
+    class UserProvider {
+        - userRepository : IUserRepo
+        + createUser(String, int, long) : User
+        + getUserById(int) : User
+        + getUserByName(String) : User
+        + getUserByName() : User[0.*]
+        + updateUser(User) : boolean
+        + deleteUser(User) : boolean
+    }
+}
+package interfaces {
+    interface ICarrierRepo {
+        + read(int) : Carrier
+    }
+    interface ICashRepo {
+        + transaction(int, long, long) : boolean
+    }
+    interface ICustomer {
+        + getSelectedTickets() : Ticket[0.*]
+        + setSelectedTickets(Ticket[0.*]) : void
+        + getUser() : User
+        + setUser(User) : void
+        + getUserProvider() : UserProvider
+        + buyTicket(Ticket) : boolean
+        + searchTicket(Date, int) : Ticket[0.*]
+    }
+    interface ITicketRepo {
+        + addTicket(Ticket) : boolean
+        + readAll(int) : Ticket[0.*]
+        + update(Ticket) : boolean
+        + delete(Ticket) : boolean
+        + createTicket(int, String, Date, int) : Ticket
+    }
+    interface IUserRepo {
+        + create(String, int, long) : int
+        + read(int) : User
+        + read(String) : User
+        + readAll() : User[0.*]
+        + update(User) : boolean
+        + delete(User) : boolean
+    }
+}
+package models {
+    class BankAccount {
+        - static nextAccountNumber : long
+        - accountNumber : long
+        - balance : int
+        + getAccountNumber() : long
+        + getBalance() : int
+        + deposit(int) : void
+        + withdraw(int) : boolean
+        + equals(Object) : boolean
+        + hashCode() : int
+        + toString() : String
+    }
+    class Carrier {
+        - static nextId : int
+        - id : int
+        - name : String
+        - route : String
+        + getId() : int
+        + getName() : String
+        + getRoute() : String
+        + equals(Object) : boolean
+        + hashCode() : int
+        + toString() : String
+    }
+    class Ticket {
+        - static nextId : int
+        - id : int
+        - routeNumber : int
+        - passengerName : String
+        - date : Date
+        - price : int
+        - isSold : boolean
+        + getId() : int
+        + getRouteNumber() : int
+        + getPassengerName() : String
+        + getDate() : Date
+        + getPrice() : int
+        + isSold() : boolean
+        + setSold(boolean) : void
+        + equals(Object) : boolean
+        + hashCode() : int
+        + toString() : String
+    }
+    class User {
+        - static nextId : int
+        - id : int
+        - userName : String
+        - passwordHash : int
+        - cardNumber : long
+        + getId() : int
+        + getUserName() : String
+        + getPasswordHash() : int
+        + getCardNumber() : long
+        + equals(Object) : boolean
+        + hashCode() : int
+        static
+   }
+}
+package services {
+    class CarrierRepository {
+        - static carrierRepository : CarrierRepository
+        - carriers : Carrier[0.*]
+        + static getCarrierRepository() : CarrierRepository
+        + read(int) : Carrier
+        - initializeDummyCarriers() : void
+    }
+    class CashRepository {
+        - static cashRepository : CashRepository
+        - clients : BankAccount[0.*]
+        + static getCashRepository() : CashRepository
+        + getClients() : BankAccount[0.*]
+        + transaction(int, long, long) : boolean
+        - initializeDummyBankAccounts() : void
+        + findAccountByAccountNumber(long) : BankAccount
+    }
+    class TicketRepository {
+        - static ticketRepository : TicketRepository
+        - tickets : Ticket[0.*]
+        + static getTicketRepository() : TicketRepository
+        + addTicket(Ticket) : boolean
+        + readAll(int) : Ticket[0.*]
+        + update(Ticket) : boolean
+        + delete(Ticket) : boolean
+        + createTicket(int, String, Date, int) : Ticket
+        - initializeDummyTickets() : void
+    }
+    class UserRepository {
+        - static userRepository : UserRepository
+        - users : User[0.*]
+        + static getUserRepository() : UserRepository
+        + create(String, int, long) : int
+        + read(int) : User
+        + read(String) : User
+        + readAll() : User[0.*]
+        + update(User) : boolean
+        + delete(User) : boolean
+        + initializeDummyUsers() : void
+    }
+}
+
+Authentication o-- UserProvider
+Start o-- UserProvider
+Start o-- TicketProvider
+Start o-- CashProvider
+
+CashProvider o-- CashRepository
+Customer o-- User
+Customer o-- CashProvider
+Customer o-- TicketProvider
+Customer "0.*" *-- Ticket
+TicketProvider o-- ITicketRepo
+UserProvider o-- IUserRepo
+
+CarrierRepository -> ICarrierRepo : implements
+CarrierRepository "0.*" *-- Carrier
+CashRepository -> ICashRepo : implements
+CashRepository "0.*" *-- BankAccount
+TicketRepository -> ITicketRepo : implements
+TicketRepository "0.*" *-- Ticket
+UserRepository -> IUserRepo : implements
+UserRepository "0.*" *-- User
+@enduml
