@@ -1,0 +1,294 @@
+openapi: 3.0.0
+info:
+  title: Cloud Resource Ordering API
+  version: 1.0.0
+servers:
+  # Added by API Auto Mocking Plugin
+  - description: SwaggerHub API Auto Mocking
+    url: https://virtserver.swaggerhub.com/tolik-martyn/Hw9/1.0.0
+  - url: http://localhost:8080/api/hw9
+paths:
+  /orders:
+    post:
+      summary: Создать заказ на облако
+      description: Создает новый заказ в облачном сервисе.
+      operationId: createOrder
+      tags:
+        - Заказы
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OrderInput'
+      responses:
+        '201':
+          description: Заказ успешно создан
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Order'
+              example:
+                order_id: 1
+                start_date: "2023-09-10T12:00:00Z"
+                end_date: "2023-09-20T12:00:00Z"
+                ip_address:
+                  ip_address_id: 123
+                  ip_address: "192.168.1.1"
+                user_name: "John Doe"
+                email: "john.doe@example.com"
+                total_cpu: 4
+                total_ram: 8
+                total_rom: 256
+                os: "Windows"
+                price: 100.0
+        '400':
+          description: Некорректный запрос
+        '500':
+          description: Внутренняя ошибка сервера
+        default:
+          description: Неизвестная ошибка
+
+    get:
+      summary: Получить список всех заказов
+      description: Возвращает список всех заказов в облачном сервисе.
+      operationId: getAllOrders
+      tags:
+        - Заказы
+      responses:
+        '200':
+          description: Список заказов
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/OrderList'
+              example:
+                - order_id: 1
+                  start_date: "2023-09-10T12:00:00Z"
+                  end_date: "2023-09-20T12:00:00Z"
+                  ip_address_id: 123
+                  user_id: 456
+                  server_pool_id: 789
+                  price: 100.0
+        '500':
+          description: Внутренняя ошибка сервера
+        default:
+          description: Неизвестная ошибка
+
+  /orders/{order_id}:
+    get:
+      summary: Получить информацию об определенном заказе
+      description: Возвращает информацию о заказе по его ID.
+      operationId: getOrderById
+      tags:
+        - Заказы
+      parameters:
+        - name: order_id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Информация о заказе
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Order'
+              example:
+                order_id: 1
+                start_date: "2023-09-10T12:00:00Z"
+                end_date: "2023-09-20T12:00:00Z"
+                ip_address:
+                  ip_address_id: 123
+                  ip_address: "192.168.1.1"
+                user_name: "John Doe"
+                email: "john.doe@example.com"
+                total_cpu: 4
+                total_ram: 8
+                total_rom: 256
+                os: "Windows"
+                price: 100.0
+        '404':
+          description: Заказ не найден
+        '500':
+          description: Внутренняя ошибка сервера
+        default:
+          description: Неизвестная ошибка
+
+    delete:
+      summary: Отменить заказ на облако
+      description: Отменяет заказ в облачном сервисе.
+      operationId: cancelOrder
+      tags:
+        - Заказы
+      parameters:
+        - name: order_id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '204':
+          description: Заказ успешно отменен
+        '404':
+          description: Заказ не найден
+        '500':
+          description: Внутренняя ошибка сервера
+        default:
+          description: Неизвестная ошибка
+
+components:
+  schemas:
+    User:
+      x-unused: true
+      type: object
+      properties:
+        user_id:
+          type: integer
+        user_name:
+          type: string
+        email:
+          type: string
+
+    Server:
+      x-unused: true
+      type: object
+      properties:
+        server_id:
+          type: integer
+        cpu:
+          type: integer
+        ram:
+          type: integer
+        rom:
+          type: integer
+
+    ServerPool:
+      x-unused: true
+      type: object
+      properties:
+        server_pool_id:
+          type: integer
+        name:
+          type: string
+        description:
+          type: string
+        server_id:
+          type: integer
+        total_cpu:
+          type: integer
+        total_ram:
+          type: integer
+        total_rom:
+          type: integer
+        os:
+          type: string
+          enum:
+            - Windows
+            - Linux
+
+    IPAddress:
+      type: object
+      properties:
+        ip_address_id:
+          type: integer
+        ip_address:
+          type: string
+
+    OrderInput:
+      type: object
+      properties:
+        start_date:
+          type: string
+          format: date-time
+        end_date:
+          type: string
+          format: date-time
+        ip_address_id:
+          type: integer
+        user_id:
+          type: integer
+        server_pool_id:
+          type: integer
+        price:
+          type: number
+      required:
+        - start_date
+        - end_date
+        - ip_address_id
+        - user_id
+        - server_pool_id
+        - price
+
+    Order:
+      type: object
+      properties:
+        order_id:
+          type: integer
+        start_date:
+          type: string
+          format: date-time
+        end_date:
+          type: string
+          format: date-time
+        ip_address:
+          $ref: '#/components/schemas/IPAddress'
+        user_name:
+          type: string
+        email:
+          type: string
+        total_cpu:
+          type: integer
+        total_ram:
+          type: integer
+        total_rom:
+          type: integer
+        os:
+          type: string
+        price:
+          type: number
+      example:
+        order_id: 1
+        start_date: "2023-09-10T12:00:00Z"
+        end_date: "2023-09-20T12:00:00Z"
+        ip_address:
+          ip_address_id: 123
+          ip_address: "192.168.1.1"
+        user_name: "John Doe"
+        email: "john.doe@example.com"
+        total_cpu: 4
+        total_ram: 8
+        total_rom: 256
+        os: "Windows"
+        price: 100.0
+
+    OrderList:
+      type: object
+      properties:
+        order_id:
+          type: integer
+        start_date:
+          type: string
+          format: date-time
+        end_date:
+          type: string
+          format: date-time
+        ip_address_id:
+          type: integer
+        user_id:
+          type: integer
+        server_pool_id:
+          type: integer
+        price:
+          type: number
+      example:
+        - order_id: 1
+          start_date: "2023-09-10T12:00:00Z"
+          end_date: "2023-09-20T12:00:00Z"
+          ip_address_id: 123
+          user_id: 456
+          server_pool_id: 789
+          price: 100.0
